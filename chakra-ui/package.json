@@ -1,6 +1,7 @@
 {
   "private": true,
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "build": "remix build",
     "dev": "remix dev",
@@ -8,25 +9,26 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.3.6",
-    "@emotion/react": "^11.10.4",
-    "@emotion/server": "^11.10.0",
-    "@emotion/styled": "^11.10.4",
-    "@remix-run/node": "^1.19.3",
-    "@remix-run/react": "^1.19.3",
-    "@remix-run/serve": "^1.19.3",
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/react": "^11.11.3",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@remix-run/css-bundle": "^2.6.0",
+    "@remix-run/node": "^2.6.0",
+    "@remix-run/react": "^2.6.0",
+    "@remix-run/serve": "^2.6.0",
     "framer-motion": "^6.5.1",
-    "isbot": "^3.6.5",
+    "isbot": "^4.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.19.3",
-    "@remix-run/eslint-config": "^1.19.3",
-    "@types/react": "^18.0.25",
-    "@types/react-dom": "^18.0.8",
-    "eslint": "^8.27.0",
-    "typescript": "^4.8.4"
+    "@remix-run/dev": "^2.6.0",
+    "@remix-run/eslint-config": "^2.6.0",
+    "@types/react": "^18.2.53",
+    "@types/react-dom": "^18.2.18",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=14.0.0"
