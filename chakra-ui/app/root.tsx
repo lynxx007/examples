@@ -1,84 +1,87 @@
-import { ChakraProvider, Box, Heading } from "@chakra-ui/react";
-import type { MetaFunction } from "@remix-run/node";
+import { cssBundleHref } from '@remix-run/css-bundle'
+import type { LinksFunction } from '@remix-run/node'
 import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useCatch,
-} from "@remix-run/react";
+    Links,
+    LiveReload,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+} from '@remix-run/react'
+import { withEmotionCache } from '@emotion/react'
+import { ServerStyleContext, ClientStyleContext } from './context'
+import { ChakraProvider, extendTheme } from '@chakra-ui/react'
+import { useContext, useEffect } from 'react'
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  viewport: "width=device-width,initial-scale=1",
-});
+export const links: LinksFunction = () => [
+    ...(cssBundleHref
+        ? [
+              { rel: 'stylesheet', href: cssBundleHref },
+          ]
+        : []),
+]
 
-function Document({
-  children,
-  title = "App title",
-}: {
-  children: React.ReactNode;
-  title?: string;
-}) {
-  return (
-    <html lang="en">
-      <head>
-        <Meta />
-        <title>{title}</title>
-        <Links />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  );
+interface DocumentProps {
+    children: React.ReactNode
 }
+
+const Document = withEmotionCache(
+    ({ children }: DocumentProps, emotionCache) => {
+        const serverStyleData = useContext(ServerStyleContext)
+        const clientStyleData = useContext(ClientStyleContext)
+
+        // Only executed on client
+        useEffect(() => {
+            // re-link sheet container
+            emotionCache.sheet.container = document.head
+            // re-inject tags
+            const tags = emotionCache.sheet.tags
+            emotionCache.sheet.flush()
+            tags.forEach((tag) => {
+                // eslint-disable-next-line no-extra-semi
+                ;(emotionCache.sheet as any)._insertTag(tag)
+            })
+            // reset cache to reapply global styles
+            clientStyleData?.reset()
+        }, [])
+
+        return (
+            <html lang="en">
+                <head>
+                    <meta charSet="utf-8" />
+                    <meta
+                        name="viewport"
+                        content="width=device-width, initial-scale=1"
+                    />
+                    <Meta />
+                    <Links />
+                    {serverStyleData?.map(({ key, ids, css }) => (
+                        <style
+                            key={key}
+                            data-emotion={`${key} ${ids.join(' ')}`}
+                            dangerouslySetInnerHTML={{ __html: css }}
+                        />
+                    ))}
+                </head>
+                <body>
+                    {children}
+                    <ScrollRestoration />
+                    <Scripts />
+                    <LiveReload />
+                </body>
+            </html>
+        )
+    }
+)
+
+
 
 export default function App() {
-  // throw new Error("💣💥 Booooom");
-
-  return (
-    <Document>
-      <ChakraProvider>
-        <Outlet />
-      </ChakraProvider>
-    </Document>
-  );
-}
-
-// How ChakraProvider should be used on CatchBoundary
-export function CatchBoundary() {
-  const caught = useCatch();
-
-  return (
-    <Document title={`${caught.status} ${caught.statusText}`}>
-      <ChakraProvider>
-        <Box>
-          <Heading as="h1" bg="purple.600">
-            [CatchBoundary]: {caught.status} {caught.statusText}
-          </Heading>
-        </Box>
-      </ChakraProvider>
-    </Document>
-  );
-}
-
-// How ChakraProvider should be used on ErrorBoundary
-export function ErrorBoundary({ error }: { error: Error }) {
-  return (
-    <Document title="Error!">
-      <ChakraProvider>
-        <Box>
-          <Heading as="h1" bg="blue.500">
-            [ErrorBoundary]: There was an error: {error.message}
-          </Heading>
-        </Box>
-      </ChakraProvider>
-    </Document>
-  );
+    return (
+        <Document>
+            <ChakraProvider>
+                <Outlet />
+            </ChakraProvider>
+        </Document>
+    )
 }
