@@ -7,10 +7,12 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
+    isRouteErrorResponse,
+    useRouteError,
 } from '@remix-run/react'
 import { withEmotionCache } from '@emotion/react'
 import { ServerStyleContext, ClientStyleContext } from './context'
-import { ChakraProvider, extendTheme } from '@chakra-ui/react'
+import { Box, ChakraProvider, Heading, Text, extendTheme } from '@chakra-ui/react'
 import { useContext, useEffect } from 'react'
 
 export const links: LinksFunction = () => [
@@ -85,3 +87,37 @@ export default function App() {
         </Document>
     )
 }
+
+  // How ChakraProvider should be used on ErrorBoundary
+  export function ErrorBoundary() {
+    const error = useRouteError()
+    
+    if(isRouteErrorResponse(error)){
+        return (
+            <Document>
+                <ChakraProvider>
+                    <Box bg={"red.100"} p={4}>
+                        <Heading>Oops</Heading>
+                        <Text>Status: {error.status}</Text>
+                        <Text>{error.data.message}</Text>
+                    </Box>
+                </ChakraProvider>
+            </Document>
+        )
+    }
+
+// Don't forget to typecheck with your own logic.
+// Any value can be thrown, not just errors!
+//   let errorMessage = "Unknown error";
+//   if (isDefinitelyAnError(error)) {
+//     errorMessage = error.message;
+//   }
+
+//   return (
+//     <div>
+//       <h1>Uh oh ...</h1>
+//       <p>Something went wrong.</p>
+//       <pre>{errorMessage}</pre>
+//     </div>
+//   );
+  }
