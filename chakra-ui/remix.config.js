@@ -1,9 +1,7 @@
 /** @type {import('@remix-run/dev').AppConfig} */
-module.exports = {
-  future: {
-    v2_routeConvention: true,
-  },
+export default {
   ignoredRouteFiles: ["**/.*"],
+  postcss: true,
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // publicPath: "/build/",
